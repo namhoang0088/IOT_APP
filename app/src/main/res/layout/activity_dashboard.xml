@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Air-Temperature"
+                    android:text="Nhiệt độ không khí"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -94,7 +94,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Air-Humidity"
+                    android:text="Độ ẩm không khí"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -152,7 +152,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Soil-Temperature"
+                    android:text="Nhiệt độ đất"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -211,7 +211,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Soil-Humidity"
+                    android:text="Độ ẩm đất"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -269,7 +269,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Soil-PH"
+                    android:text="Độ pH đất"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -386,7 +386,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="UV"
+                    android:text="Cường độ tia UV"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 
@@ -445,7 +445,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Light intensity"
+                    android:text="Cường độ ánh sáng"
                     android:textSize="30sp"
                     android:textStyle="bold" />
 

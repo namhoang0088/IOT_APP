@@ -171,7 +171,7 @@
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="364dp"
                     android:layout_height="150dp"
                     android:orientation="horizontal">
 
@@ -180,12 +180,12 @@
                         android:layout_width="2dp"
                         android:layout_height="match_parent"
                         android:layout_weight="4"
-                        android:background="#F3EBEB" >
+                        android:background="#F3EBEB">
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="150dp"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/fan_image">
+                            android:background="@drawable/maysuoi">
                             <!-- Nội dung của LinearLayout con -->
                         </LinearLayout>
                     </LinearLayout>
@@ -203,7 +203,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="34dp"
                             android:gravity="center"
-                            android:text="Quạt thông gió"
+                            android:text="Máy sưởi"
                             android:textSize="24sp"
                             android:textStyle="bold" />
 
@@ -227,6 +227,75 @@
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="horizontal">
+
+                    <!-- Phần 1: Tỷ lệ 2 -->
+                    <LinearLayout
+                        android:layout_width="2dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4"
+                        android:background="#F3EBEB" >
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/maylanh">
+                            <!-- Nội dung của LinearLayout con -->
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+                    <!-- Phần 2: Tỷ lệ 5 -->
+                    <LinearLayout
+                        android:layout_width="16dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="6"
+                        android:background="#FFFFFF"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="34dp"
+                            android:gravity="center"
+                            android:text="Máy lạnh"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="55dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginRight="55dp"
+                            android:layout_marginBottom="10dp"
+                            app:cardBackgroundColor="#F44336"
+                            app:cardCornerRadius="50dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/power_on"></LinearLayout>
+                        </androidx.cardview.widget.CardView>
+
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
 
         </LinearLayout>
 

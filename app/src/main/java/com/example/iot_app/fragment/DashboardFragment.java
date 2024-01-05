@@ -45,7 +45,12 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import android.os.AsyncTask;
 
 public class DashboardFragment extends Fragment implements OnChartValueSelectedListener {
     MQTTHelper mqttHelper;
@@ -78,6 +83,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             }
         });
 
+        getFeedData("NhanHuynh", "aio_zxeo20IqleJBD2jDpd8RSxDfiiQC", "NhanHuynh/feeds/temp-air", 10);
         return view;
     }
 
@@ -135,18 +141,18 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         leftAxis.setAxisMinimum(0f);
 
         final List<String> xLabel = new ArrayList<>();
-        xLabel.add("Jan");
-        xLabel.add("Feb");
-        xLabel.add("Mar");
-        xLabel.add("Apr");
-        xLabel.add("May");
-        xLabel.add("Jun");
-        xLabel.add("Jul");
-        xLabel.add("Aug");
-        xLabel.add("Sep");
-        xLabel.add("Oct");
-        xLabel.add("Nov");
-        xLabel.add("Dec");
+        xLabel.add("1");
+        xLabel.add("2");
+        xLabel.add("3");
+        xLabel.add("4");
+        xLabel.add("5");
+        xLabel.add("6");
+        xLabel.add("7");
+        xLabel.add("8");
+        xLabel.add("9");
+        xLabel.add("10");
+        xLabel.add("11");
+        xLabel.add("12");
 
         XAxis xAxis = mChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -206,7 +212,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
     private static DataSet dataChart() {
 
         LineData d = new LineData();
-        int[] data = new int[] { 1, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1, 9 };
+        int[] data = new int[] { 27, 28, 29, 29, 29, 30, 32, 33, 33, 34, 34, 34 };
 
         ArrayList<Entry> entries = new ArrayList<Entry>();
 
@@ -214,7 +220,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             entries.add(new Entry(index, data[index]));
         }
 
-        LineDataSet set = new LineDataSet(entries, "Request Ots approved");
+        LineDataSet set = new LineDataSet(entries, "Temperature");
         set.setColor(Color.GREEN);
         set.setLineWidth(2.5f);
         set.setCircleColor(Color.GREEN);
@@ -294,6 +300,69 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 //------------------------------------
         dialog.show();
     }
+    //lấy data------------------------------------------------
+    private class FetchDataAsyncTask extends AsyncTask<Void, Void, String> {
+        private String username;
+        private String key;
+        private String feed;
+        private int numberOfDataPoints;
 
+        // Constructor
+        public FetchDataAsyncTask(String username, String key, String feed, int numberOfDataPoints) {
+            this.username = username;
+            this.key = key;
+            this.feed = feed;
+            this.numberOfDataPoints = numberOfDataPoints;
+        }
 
+        @Override
+        protected String doInBackground(Void... voids) {
+            try {
+                String apiUrl = "https://io.adafruit.com/api/v2/" + username + "/feeds/" + feed + "/data?limit=" + numberOfDataPoints;
+                URL url = new URL(apiUrl);
+
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("X-AIO-Key", key);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder responseData = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    responseData.append(line);
+                }
+
+                reader.close();
+                urlConnection.disconnect();
+
+                return responseData.toString();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            if (result != null) {
+                // Xử lý dữ liệu ở đây
+                Log.d("AdafruitIO", "Data: " + result);
+            } else {
+                // Xử lý lỗi ở đây
+                Log.e("AdafruitIO", "Error fetching data");
+            }
+        }
+    }
+
+    // Gọi AsyncTask từ onCreateView hoặc một phương thức khác
+    private void getFeedData(String username, String key, String feed, int numberOfDataPoints) {
+        new FetchDataAsyncTask(username, key, feed, numberOfDataPoints).execute();
+    }
 }
+
+
+
