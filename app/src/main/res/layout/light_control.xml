@@ -19,9 +19,9 @@
         android:paddingRight="6dp"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
-        android:text="Kiểm soát độ ẩm"
+        android:text="Kiểm soát ánh sáng"
         android:textColor="@android:color/black"
-        android:textSize="30dp"
+        android:textSize="26dp"
         android:textStyle="bold"
         />
 
@@ -39,7 +39,7 @@
                 android:id="@+id/light_picture"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:src="@drawable/humidity_icon"
+                android:src="@drawable/img_2"
                 android:orientation="vertical"
                 android:padding="16dp" />
 
@@ -55,7 +55,7 @@
                     android:id="@+id/status_light_seekbar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="25"
+                    android:text="0"
                     android:textSize="50dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
@@ -67,8 +67,8 @@
                 android:id="@+id/seekBar_light"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="40"
-                android:progress="19"
+                android:max="1000"
+                android:progress="0"
                 android:layout_margin="16dp"
                 android:thumb="@drawable/power_seekbar"
                 android:progressDrawable="@drawable/custtom_seekbar_temp"
@@ -98,7 +98,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Độ ẩm"
+                        android:text="Ánh sáng"
                         android:textSize="20dp"/>
                 </LinearLayout>
 
@@ -116,30 +116,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="%"
+                        android:text="Lux"
                         android:textSize="20dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tự động:"
-                        android:textSize="20dp"
-                        android:textStyle="bold"
-                        android:layout_marginRight="10dp"/>
-
-                    <com.github.angads25.toggle.widget.LabeledSwitch
-                        android:id="@+id/switch_light"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        app:on="false"
-                        app:colorBorder="@color/colorAccent"/>
-
                 </LinearLayout>
 
             </LinearLayout>

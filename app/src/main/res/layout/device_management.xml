@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:orientation="vertical">
@@ -42,10 +42,10 @@
 
                         <LinearLayout
                             android:id="@+id/light_control"
-                            android:orientation="vertical"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/light_image">
+                            android:background="@drawable/light_image"
+                            android:orientation="vertical">
                             <!-- Nội dung của LinearLayout con -->
                         </LinearLayout>
                     </LinearLayout>
@@ -75,15 +75,15 @@
                             android:layout_marginBottom="10dp"
                             android:layout_marginLeft="55dp"
                             android:layout_marginRight="55dp"
-                            app:cardBackgroundColor="#00CC66"
+                            app:cardBackgroundColor="#F44336"
                             app:cardCornerRadius="50dp">
 
                             <LinearLayout
                                 android:id="@+id/light_status"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:background="@drawable/power_on"></LinearLayout>
+                                android:background="@drawable/power_on"
+                                android:orientation="vertical"></LinearLayout>
                         </androidx.cardview.widget.CardView>
 
 
@@ -115,6 +115,7 @@
                         android:background="#F3EBEB" >
 
                         <LinearLayout
+                            android:id="@+id/pump_control"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/pump_image">
@@ -140,6 +141,7 @@
                             android:textStyle="bold" />
 
                         <androidx.cardview.widget.CardView
+                            android:id="@+id/button_pump"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginLeft="55dp"
@@ -171,7 +173,7 @@
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
-                    android:layout_width="364dp"
+                    android:layout_width="match_parent"
                     android:layout_height="150dp"
                     android:orientation="horizontal">
 
@@ -183,6 +185,7 @@
                         android:background="#F3EBEB">
 
                         <LinearLayout
+                            android:id="@+id/heater_control"
                             android:layout_width="150dp"
                             android:layout_height="wrap_content"
                             android:background="@drawable/maysuoi">
@@ -208,6 +211,7 @@
                             android:textStyle="bold" />
 
                         <androidx.cardview.widget.CardView
+                            android:id="@+id/button_heater"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginLeft="55dp"
@@ -251,6 +255,7 @@
                         android:background="#F3EBEB" >
 
                         <LinearLayout
+                            android:id="@+id/cool_control"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@drawable/maylanh">
@@ -276,6 +281,7 @@
                             android:textStyle="bold" />
 
                         <androidx.cardview.widget.CardView
+                            android:id="@+id/button_cool"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_marginLeft="55dp"

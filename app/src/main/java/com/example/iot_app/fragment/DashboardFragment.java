@@ -23,12 +23,20 @@ import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.example.iot_app.R;
 
 // for chart
 import android.widget.Toast;
+
+import com.github.angads25.toggle.interfaces.OnToggledListener;
+import com.github.angads25.toggle.model.ToggleableView;
+import com.github.angads25.toggle.widget.LabeledSwitch;
 import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -36,6 +44,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import android.graphics.Color;
 import com.github.mikephil.charting.components.YAxis;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import com.github.mikephil.charting.charts.CombinedChart;
 import java.util.List;
@@ -56,6 +66,10 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
     MQTTHelper mqttHelper;
     TextView txtTemperature;
     TextView txtHumidity;
+    TextView txtHumisoil;
+    TextView txtTempsoil;
+    TextView txtLight;
+    TextView txtUv;
 
     private CombinedChart mChart;
 
@@ -65,10 +79,20 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         View view = inflater.inflate(R.layout.activity_dashboard, container, false);
         txtTemperature = view.findViewById(R.id.txtTemperature);
         txtHumidity = view.findViewById(R.id.txtHumidity);
+        txtTempsoil = view.findViewById(R.id.txt_soil_temp);
+        txtHumisoil = view.findViewById(R.id.txt_soil_humi);
+        txtLight = view.findViewById(R.id.txt_Lux);
+        txtUv = view.findViewById(R.id.txt_uv);
         startMQTT();
 
         LinearLayout chart_temperature = view.findViewById(R.id.chartTemperature);
         LinearLayout temp_control = view.findViewById(R.id.temperature_control);
+        LinearLayout humi_control = view.findViewById(R.id.humidity_control);
+        LinearLayout light_control = view.findViewById(R.id.lux_control);
+        LinearLayout humi_soil_control = view.findViewById(R.id.humi_soil_control);
+
+        //sự kiện nhấn----------------------begin------------------------------------------
+
         chart_temperature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,7 +107,24 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             }
         });
 
-        getFeedData("NhanHuynh", "aio_zxeo20IqleJBD2jDpd8RSxDfiiQC", "NhanHuynh/feeds/temp-air", 10);
+        humi_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { openHumiditycontrol(Gravity.CENTER);
+            }
+        });
+
+        humi_soil_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { openHumisoilcontrol(Gravity.CENTER);
+            }
+        });
+        light_control.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { openLightcontrol(Gravity.CENTER);
+            }
+        });
+
+        //sự kiện nhấn------------------------------end----------------------------------------
         return view;
     }
 
@@ -103,11 +144,23 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 Log.d("TEST",topic + "***" + message.toString());
-                if(topic.contains("NhanHuynh/feeds/temp-air")){
+                if(topic.contains("NhanHuynh/feeds/temp_air")){
                     txtTemperature.setText(message.toString());
                 }
                 if(topic.contains("NhanHuynh/feeds/humi-air")){
                     txtHumidity.setText(message.toString());
+                }
+                if(topic.contains("NhanHuynh/feeds/temp_soil")){
+                    txtTempsoil.setText(message.toString());
+                }
+                if(topic.contains("NhanHuynh/feeds/humi-soil")){
+                    txtHumisoil.setText(message.toString());
+                }
+                if(topic.contains("NhanHuynh/feeds/light")){
+                    txtLight.setText(message.toString());
+                }
+                if(topic.contains("NhanHuynh/feeds/uv")){
+                    txtUv.setText(message.toString());
                 }
             }
 
@@ -242,7 +295,6 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         final Dialog dialog = new Dialog(requireContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.temperature_control);
-
         Window window = dialog.getWindow();
         if(window == null){
             return;
@@ -261,6 +313,7 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
             dialog.setCancelable(false);
         }
 
+
 //        Hiển thị thông số seekbar lên texview
         TextView tv;
         SeekBar sbar;
@@ -270,6 +323,19 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
         sbar = dialog.findViewById(R.id.seekBar_temp);
         picture = dialog.findViewById(R.id.temp_picture);
         bgTempControl = dialog.findViewById(R.id.bg_temp_control);
+
+        getData("NhanHuynh", "aio_oaXQ14CIwbosTjcgBbME33MLzO1A", "temp-air-setpoint", 1, new DeviceFragment.DataCallback() {
+            @Override
+            public void onDataReceived(int value) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(String.valueOf(value));
+                        sbar.setProgress(value);
+                    }
+                });
+            }
+        });
 
         sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -294,73 +360,290 @@ public class DashboardFragment extends Fragment implements OnChartValueSelectedL
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                String currentText = tv.getText().toString();
+                sendDataMQTT("NhanHuynh/feeds/temp-air-setpoint", currentText);
             }
         });
 //------------------------------------
         dialog.show();
     }
-    //lấy data------------------------------------------------
-    private class FetchDataAsyncTask extends AsyncTask<Void, Void, String> {
-        private String username;
-        private String key;
-        private String feed;
-        private int numberOfDataPoints;
+    private void openHumisoilcontrol(int gravity){
+        final Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.humidity_soil_control);
 
-        // Constructor
-        public FetchDataAsyncTask(String username, String key, String feed, int numberOfDataPoints) {
-            this.username = username;
-            this.key = key;
-            this.feed = feed;
-            this.numberOfDataPoints = numberOfDataPoints;
+        Window window = dialog.getWindow();
+        if(window == null){
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = gravity;
+        window.setAttributes(windowAttributes);
+
+
+        if(Gravity.CENTER == gravity){
+            dialog.setCancelable(true);
+        } else{
+            dialog.setCancelable(false);
         }
 
-        @Override
-        protected String doInBackground(Void... voids) {
-            try {
-                String apiUrl = "https://io.adafruit.com/api/v2/" + username + "/feeds/" + feed + "/data?limit=" + numberOfDataPoints;
-                URL url = new URL(apiUrl);
+//        Hiển thị thông số seekbar lên texview
+        TextView tv;
+        SeekBar sbar;
+        tv = dialog.findViewById(R.id.status_humi_soil_seekbar);
+        sbar = dialog.findViewById(R.id.seekBar_humi_soil);
+        getData("NhanHuynh", "aio_oaXQ14CIwbosTjcgBbME33MLzO1A", "humi-soil-setpoint", 1, new DeviceFragment.DataCallback() {
+            @Override
+            public void onDataReceived(int value) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(String.valueOf(value));
+                        sbar.setProgress(value);
+                    }
+                });
+            }
+        });
+        sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tv.setText(String.valueOf(i));
+                if( i > 30){
 
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("X-AIO-Key", key);
+                } else if(i <=20 && i >10){
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                StringBuilder responseData = new StringBuilder();
-                String line;
+                } else if(i <= 10){
 
-                while ((line = reader.readLine()) != null) {
-                    responseData.append(line);
                 }
-
-                reader.close();
-                urlConnection.disconnect();
-
-                return responseData.toString();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
             }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                String currentText = tv.getText().toString();
+                sendDataMQTT("NhanHuynh/feeds/humi-soil-setpoint", currentText);
+            }
+        });
+
+//------------------------------------
+        dialog.show();
+    }
+
+    private void openLightcontrol(int gravity){
+        final Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.light_control);
+
+        Window window = dialog.getWindow();
+        if(window == null){
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = gravity;
+        window.setAttributes(windowAttributes);
+
+
+        if(Gravity.CENTER == gravity){
+            dialog.setCancelable(true);
+        } else{
+            dialog.setCancelable(false);
         }
 
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            if (result != null) {
-                // Xử lý dữ liệu ở đây
-                Log.d("AdafruitIO", "Data: " + result);
-            } else {
-                // Xử lý lỗi ở đây
-                Log.e("AdafruitIO", "Error fetching data");
+//        Hiển thị thông số seekbar lên texview
+        TextView tv;
+        SeekBar sbar;
+        tv = dialog.findViewById(R.id.status_light_seekbar);
+        sbar = dialog.findViewById(R.id.seekBar_light);
+        getData("NhanHuynh", "aio_oaXQ14CIwbosTjcgBbME33MLzO1A", "light-setpoint", 1, new DeviceFragment.DataCallback() {
+            @Override
+            public void onDataReceived(int value) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(String.valueOf(value));
+                        sbar.setProgress(value);
+                    }
+                });
             }
+        });
+        sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tv.setText(String.valueOf(i));
+                if( i > 30){
+
+                } else if(i <=20 && i >10){
+
+                } else if(i <= 10){
+
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                String currentText = tv.getText().toString();
+                sendDataMQTT("NhanHuynh/feeds/light-setpoint", currentText);
+            }
+        });
+
+//------------------------------------
+        dialog.show();
+    }
+
+    private void openHumiditycontrol(int gravity){
+        final Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.humidity_control);
+
+        Window window = dialog.getWindow();
+        if(window == null){
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams windowAttributes = window.getAttributes();
+        windowAttributes.gravity = gravity;
+        window.setAttributes(windowAttributes);
+
+
+        if(Gravity.CENTER == gravity){
+            dialog.setCancelable(true);
+        } else{
+            dialog.setCancelable(false);
+        }
+
+//        Hiển thị thông số seekbar lên texview
+        TextView tv;
+        SeekBar sbar;
+        tv = dialog.findViewById(R.id.status_humi_seekbar);
+        sbar = dialog.findViewById(R.id.seekBar_humi);
+        getData("NhanHuynh", "aio_oaXQ14CIwbosTjcgBbME33MLzO1A", "humi-air-setpoint", 1, new DeviceFragment.DataCallback() {
+            @Override
+            public void onDataReceived(int value) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(String.valueOf(value));
+                        sbar.setProgress(value);
+                    }
+                });
+            }
+        });
+        sbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                tv.setText(String.valueOf(i));
+                if( i > 30){
+
+                } else if(i <=20 && i >10){
+
+                } else if(i <= 10){
+
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                String currentText = tv.getText().toString();
+                sendDataMQTT("NhanHuynh/feeds/humi-air-setpoint", currentText);
+            }
+        });
+
+//------------------------------------
+        dialog.show();
+    }
+
+    // gửi data--------------------------------------
+    public void sendDataMQTT(String topic, String value){
+        MqttMessage msg = new MqttMessage();
+        msg.setId(1234);
+        msg.setQos(0);
+        msg.setRetained(false);
+
+        byte[] b = value.getBytes(Charset.forName("UTF-8"));
+        msg.setPayload(b);
+
+        try {
+            mqttHelper.mqttAndroidClient.publish(topic, msg);
+        }catch (MqttException e){
         }
     }
 
-    // Gọi AsyncTask từ onCreateView hoặc một phương thức khác
-    private void getFeedData(String username, String key, String feed, int numberOfDataPoints) {
-        new FetchDataAsyncTask(username, key, feed, numberOfDataPoints).execute();
+    //lấy data------------------------------------------------
+    private void getData(String username, String key, String feed, int numberOfDataPoints, DeviceFragment.DataCallback callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String apiUrl = "https://io.adafruit.com/api/v2/" + username + "/feeds/" + feed + "/data?limit=" + numberOfDataPoints;
+                    URL url = new URL(apiUrl);
+
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.setRequestProperty("X-AIO-Key", key);
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    StringBuilder responseData = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        responseData.append(line);
+                    }
+
+                    reader.close();
+                    urlConnection.disconnect();
+
+                    processResponse(responseData.toString(), callback);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("AdafruitIO", "Error fetching data");
+                }
+            }
+        }).start();
+    }
+
+    private void processResponse(String response, DeviceFragment.DataCallback callback) {
+        if (response != null) {
+            try {
+                JSONArray dataArray = new JSONArray(response);
+
+                if (dataArray.length() > 0) {
+                    JSONObject lastDataPoint = dataArray.getJSONObject(dataArray.length() - 1);
+                    int value = lastDataPoint.getInt("value");
+
+                    Log.d("AdafruitIO", "Value: " + value);
+
+                    // Gọi lại callback với giá trị đã lấy được
+                    callback.onDataReceived(value);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("AdafruitIO", "Error parsing JSON");
+            }
+        }
     }
 }
 
